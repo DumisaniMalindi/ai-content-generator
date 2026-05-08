@@ -149,7 +149,35 @@ if st.button("Generate Content"):
         )
 
 
-generated_text = response.output[0].content[0].text
+if st.button("Generate Content"):
+    if not industry or not audience or not goal:
+        st.warning("Please fill in all fields before generating content.")
+    else:
+        client = OpenAI(
+            api_key=os.environ["GROQ_API_KEY"],
+            base_url="https://api.groq.com/openai/v1"
+        )
+
+        prompt = build_prompt(
+            content_type=content_type,
+            industry=industry,
+            audience=audience,
+            tone=tone,
+            goal=goal
+        )
+
+        response = client.responses.create(
+            model="llama-3.3-70b-versatile",
+            input=prompt
+        )
+
+        generated_text = response.output[0].content[0].text
+
+        st.subheader("✅ Generated Content")
+        st.markdown(
+            f"<div class='ai-output'>{generated_text}</div>",
+            unsafe_allow_html=True
+        )
 
 st.subheader("✅ Generated Content")
 st.markdown(
