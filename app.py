@@ -1,5 +1,7 @@
 import streamlit as st
-from groq import Groq
+from openai import OpenAI
+import os
+
 from prompt import build_prompt
 
 # -----------------------------
@@ -128,8 +130,10 @@ if st.button("Generate Content"):
     if not industry or not audience or not goal:
         st.warning("Please fill in all fields before generating content.")
     else:
-        client = Groq()
-
+        client = OpenAI(
+    api_key=os.environ["GROQ_API_KEY"],
+    base_url="https://api.groq.com/openai/v1"
+)
         prompt = build_prompt(
             content_type=content_type,
             industry=industry,
@@ -139,16 +143,17 @@ if st.button("Generate Content"):
         )
 
 
-        response = client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
-            messages=[{"role": "user", "content": prompt}],
-            temperature=0.7,
-            max_tokens=500
+        response = client.responses.create(
+    model="llama-3.3-70b-versatile",
+    input=prompt
         )
 
-        st.subheader("✅ Generated Content")
-        st.markdown(
-    f"<div class='ai-output'>{response.choices[0].message.content}</div>",
+
+generated_text = response.output[0].content[0].text
+
+st.subheader("✅ Generated Content")
+st.markdown(
+    f"<div class='ai-output'>{generated_text}</div>",
     unsafe_allow_html=True
 )
 
