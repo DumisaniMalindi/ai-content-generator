@@ -128,7 +128,7 @@ if st.button("Generate Content"):
     if not industry or not audience or not goal:
         st.warning("Please fill in all fields before generating content.")
     else:
-        client = Groq(api_key=st.secrets["GROQ_API_KEY"])
+        client = Groq()
 
         prompt = build_prompt(
             content_type=content_type,
