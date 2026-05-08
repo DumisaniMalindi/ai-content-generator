@@ -153,10 +153,8 @@ if st.button("Generate Content"):
     if not industry or not audience or not goal:
         st.warning("Please fill in all fields before generating content.")
     else:
-        client = OpenAI(
-            api_key=os.environ["GROQ_API_KEY"],
-            base_url="https://api.groq.com/openai/v1"
-        )
+        client = OpenAI()
+
 
         prompt = build_prompt(
             content_type=content_type,
