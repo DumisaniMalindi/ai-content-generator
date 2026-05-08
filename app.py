@@ -130,6 +130,8 @@ if st.button("Generate Content", key="generate_content_button"):
     if not industry.strip() or not audience.strip() or not goal.strip():
         st.warning("Please fill in all fields before generating content.")
     else:
+        os.environ["OPENAI_API_KEY"] = st.secrets["OPENAI_API_KEY"]
+        os.environ["OPENAI_BASE_URL"] = st.secrets["OPENAI_BASE_URL"]
         client = OpenAI()
         
 
