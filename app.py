@@ -1,5 +1,7 @@
+
+
 import streamlit as st
-from openai import OpenAI
+import requests
 import os
 
 from prompt import build_prompt
@@ -93,47 +95,56 @@ st.markdown(
 st.title("🧠 PHADEs Content Generator")
 st.write("Dumisani Malindi Project")
 
-# -----------------------------
-# User inputs
-# -----------------------------
-content_type = st.selectbox(
-    "Content Type",
-    [
-        "LinkedIn Post",
-        "Marketing Copy",
-        "Blog Introduction",
-        "Email",
-        "Product Description"
-    ]
-)
 
-industry = st.text_input("Industry / Topic", placeholder="e.g. Healthcare")
-audience = st.text_input("Target Audience", placeholder="e.g. Founders")
-
-tone = st.selectbox(
-    "Tone",
-    ["Professional", "Casual", "Persuasive", "Inspirational"]
-)
-
-goal = st.text_area(
-    "Content Goal",
-    placeholder="What should this content achieve?"
-)
 
 # -----------------------------
 # Generate content
 # -----------------------------
 
 
-if st.button("Generate Content", key="generate_content_button"):
+# -----------------------------
+# User inputs (FORM)
+# -----------------------------
+with st.form("generate_form"):
+    content_type = st.selectbox(
+        "Content Type",
+        [
+            "LinkedIn Post",
+            "Marketing Copy",
+            "Blog Introduction",
+            "Email",
+            "Product Description"
+        ]
+    )
+
+    industry = st.text_input("Industry / Topic", placeholder="e.g. Healthcare")
+    audience = st.text_input("Target Audience", placeholder="e.g. Founders")
+
+    tone = st.selectbox(
+        "Tone",
+        ["Professional", "Casual", "Persuasive", "Inspirational"]
+    )
+
+    goal = st.text_area(
+        "Content Goal",
+        placeholder="What should this content achieve?"
+    )
+
+    submitted = st.form_submit_button("Generate Content")
+
+
+# -----------------------------
+# Generate content (AFTER submit)
+# -----------------------------
+if submitted:
 
     if not industry.strip() or not audience.strip() or not goal.strip():
         st.warning("Please fill in all fields before generating content.")
     else:
-        os.environ["OPENAI_API_KEY"] = st.secrets["OPENAI_API_KEY"]
-        os.environ["OPENAI_BASE_URL"] = st.secrets["OPENAI_BASE_URL"]
-        client = OpenAI()
-        
+        headers = {
+            "Authorization": f"Bearer {st.secrets['GROQ_API_KEY']}",
+            "Content-Type": "application/json"
+        }
 
         prompt = build_prompt(
             content_type=content_type,
@@ -143,15 +154,23 @@ if st.button("Generate Content", key="generate_content_button"):
             goal=goal
         )
 
-        response = client.responses.create(
-            model="llama-3.3-70b-versatile",
-            input=prompt
+        payload = {
+            "model": "llama-3.3-70b-versatile",
+            "messages": [
+                {"role": "user", "content": prompt}
+            ]
+        }
+
+        response = requests.post(
+            "https://api.groq.com/openai/v1/chat/completions",
+            headers=headers,
+            json=payload,
+            timeout=30
         )
-        
 
+        response.raise_for_status()
 
-        generated_text = response.output_text
-        
+        generated_text = response.json()["choices"][0]["message"]["content"]
 
         st.subheader("✅ Generated Content")
         st.markdown(
