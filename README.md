@@ -43,3 +43,17 @@ Initial experiments with simple prompts resulted in generic and inconsistent out
 ---
 
 ### Initial Prompt (Unoptimized)
+**Observed issues:**
+- The output was generic and unfocused  
+- No clear target audience  
+- Inconsistent tone  
+- Limited control over structure and quality  
+
+This prompt relied entirely on the model’s assumptions, resulting in outputs that were not suitable for professional or real‑world use.
+
+### Optimized Prompt (Engineered Version)
+**Improvements achieved:**
+- Clear role definition for the AI  
+- Explicit audience, tone, and objective  
+- Consistent and professional output  
+- Significantly higher content relevance and readability
